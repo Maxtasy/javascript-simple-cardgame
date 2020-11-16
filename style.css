@@ -1,0 +1,106 @@
+:root {
+  --clr-gradient-1: #F3F3F3;
+  --clr-gradient-6: #0D0D0D;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--clr-gradient-6);
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--clr-gradient-1);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.player-name {
+  grid-column: 1/-1;
+  justify-self: center;
+  font-size: 3rem;
+}
+
+.round-info {
+  font-size: 2rem;
+}
+
+.card {
+  margin: .5rem;
+  height: 200px;
+  width: 125px;
+  background-color: var(--clr-gradient-1);
+  border-radius: .5rem;
+  position: relative;
+}
+
+.active-card {
+  display: none;
+}
+
+.active-card.show {
+  display: block;
+}
+
+.card.deck {
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.suit.center {
+  width: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+.card-value-suit {
+  display: flex;
+  align-items: center;
+}
+
+.card-value-suit.top {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+}
+
+.card-value-suit.bottom {
+  position: absolute;
+  bottom: 2%;
+  right: 2%;
+  transform: rotate(180deg);
+}
+
+.value {
+  font-size: 1.5rem;
+  margin-right: .25rem;
+  color: var(--clr-gradient-6);
+}
+
+.suit {
+  width: 15%;
+}
+
+.card-count {
+  color: var(--clr-gradient-6);
+}
