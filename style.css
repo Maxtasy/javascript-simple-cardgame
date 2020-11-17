@@ -1,6 +1,7 @@
 :root {
   --clr-gradient-1: #F3F3F3;
   --clr-gradient-6: #0D0D0D;
+  --clr-gradient-7: #000000;
   --clr-highlight-red: #962D3E;
 }
 
@@ -27,8 +28,7 @@ body {
 }
 
 .player-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
 }
 
 .player-name {
@@ -48,15 +48,20 @@ body {
   background-color: var(--clr-highlight-red);
   border-radius: .5rem;
   position: relative;
+  border: 1px solid var(--clr-gradient-7);
 }
 
 .active-card {
-  display: none;
   background-color: var(--clr-gradient-1);
 }
 
-.active-card.show {
-  display: block;
+.active-card.draw {
+  margin-left: -100px;
+}
+
+.active-card.face-down {
+  transform: rotateY(180deg);
+  background-color: var(--clr-highlight-red);
 }
 
 .card.deck {
@@ -65,6 +70,10 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 
 .suit.center {

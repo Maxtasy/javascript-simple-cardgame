@@ -4,23 +4,28 @@ class Game {
     this.gameStarted = false
     this.player = []
     this.computer = []
+    this.isDraw = false
+    this.drawCards = []
     this.playerDeck = document.querySelector(".player-container.player .card.deck")
-    this.playerActiveCard = document.querySelector(".player-container.player .card.active-card")
     this.computerDeck = document.querySelector(".player-container.computer .card.deck")
     this.computerActiveCard = document.querySelector(".player-container.computer .card.active-card")
     this.roundInfo = document.querySelector(".round-info")
+    this.playerContainer = document.querySelector(".player-container.player")
+    this.computerContainer = document.querySelector(".player-container.computer")
 
     this.buildDeck()
     this.assignCards()
     
-    this.playerDeck.addEventListener("click", () => this.playCard())
+    this.playerDeck.addEventListener("click", () => {
+      this.playCard()
+    })
   }
 
   buildDeck() {
     const suits = ["h", "s", "d", "c"]
   
     suits.forEach((suit) => {
-      for (let i = 2; i < 15; i++) {
+      for (let i = 7; i < 15; i++) {
         this.cards.push({suit: suit, value: i})
       }
     })
@@ -39,6 +44,59 @@ class Game {
 
       playerGetsCard = !playerGetsCard
     }
+
+    this.playerDeck.querySelector(".card-count").innerText = this.player.length
+    this.computerDeck.querySelector(".card-count").innerText = this.computer.length
+  }
+
+  createNewCard(container, faceDown) {
+    const card = document.createElement("div")
+    card.classList.add("card", "active-card", "latest")
+
+    if (this.isDraw) {
+      card.classList.add("draw")
+    }
+
+    if (faceDown) {
+      card.classList.add("face-down")
+    }
+
+    const valueSuitTop = document.createElement("div")
+    valueSuitTop.classList.add("card-value-suit", "top")
+
+    const valueTop = document.createElement("span")
+    valueTop.classList.add("value")
+
+    valueSuitTop.appendChild(valueTop)
+
+    const suitTop = document.createElement("img")
+    suitTop.classList.add("suit")
+
+    valueSuitTop.appendChild(suitTop)
+    
+    card.appendChild(valueSuitTop)
+
+    const suitCenter = document.createElement("img")
+    suitCenter.classList.add("suit", "center")
+
+    card.appendChild(suitCenter)
+
+    const valueSuitBottom = document.createElement("div")
+    valueSuitBottom.classList.add("card-value-suit", "bottom")
+
+    const valueBottom = document.createElement("span")
+    valueBottom.classList.add("value")
+
+    valueSuitBottom.appendChild(valueBottom)
+
+    const suitBottom = document.createElement("img")
+    suitBottom.classList.add("suit")
+
+    valueSuitBottom.appendChild(suitBottom)
+
+    card.appendChild(valueSuitBottom)
+
+    container.appendChild(card)
   }
 
   playCard() {
@@ -50,16 +108,41 @@ class Game {
       }
       return
     }
-    if (!this.gameStarted) {
-      this.playerActiveCard.classList.add("show")
-      this.computerActiveCard.classList.add("show")
+
+    if (this.isDraw) {
+      this.createNewCard(this.playerContainer, true)
+      this.createNewCard(this.computerContainer, true)
+      this.drawCards.push(this.player.pop())
+      this.drawCards.push(this.computer.pop())
     }
     
     const playerTopCard = this.player.shift()
     const computerTopCard = this.computer.shift()
-    
+
     this.playerDeck.querySelector(".card-count").innerText = this.player.length
     this.computerDeck.querySelector(".card-count").innerText = this.computer.length
+
+    if (!this.isDraw) {
+      this.playerContainer.querySelectorAll(".active-card").forEach(card => {
+        card.remove()
+      })
+      this.computerContainer.querySelectorAll(".active-card").forEach(card => {
+        card.remove()
+      })
+    } else {
+      this.playerContainer.querySelectorAll(".active-card").forEach(card => {
+        card.classList.remove("latest")
+      })
+      this.computerContainer.querySelectorAll(".active-card").forEach(card => {
+        card.classList.remove("latest")
+      })
+    }
+
+    this.createNewCard(this.playerContainer)
+    this.createNewCard(this.computerContainer)
+    
+    const playerActiveCard = document.querySelector(".player-container.player .card.active-card.latest")
+    const computerActiveCard = document.querySelector(".player-container.computer .card.active-card.latest")
 
     const playerValue = playerTopCard[0].value
     let playerValueDisplay = playerValue
@@ -74,13 +157,13 @@ class Game {
       playerValueDisplay = "A"
     }
 
-    this.playerActiveCard.querySelectorAll(".value").forEach(v => {
+    playerActiveCard.querySelectorAll(".value").forEach(v => {
       v.innerText = playerValueDisplay
     })
 
     const playerSuit = playerTopCard[0].suit
 
-    this.playerActiveCard.querySelectorAll(".suit").forEach(s => {
+    playerActiveCard.querySelectorAll(".suit").forEach(s => {
       s.src = `assets/${playerSuit}.svg`
     })
 
@@ -97,31 +180,48 @@ class Game {
       computerValueDisplay = "A"
     }
 
-    this.computerActiveCard.querySelectorAll(".value").forEach(v => {
+    computerActiveCard.querySelectorAll(".value").forEach(v => {
       v.innerText = computerValueDisplay
     })
 
     const computerSuit = computerTopCard[0].suit
 
-    this.computerActiveCard.querySelectorAll(".suit").forEach(s => {
+    computerActiveCard.querySelectorAll(".suit").forEach(s => {
       s.src = `assets/${computerSuit}.svg`
     })
 
     const winner = this.winner(playerValue, computerValue)
-
+    
     if (winner === "player") {
+      if (this.isDraw) {
+        this.drawCards.forEach(card => {
+          this.player.push(card)
+        })
+        this.drawCards = []
+      }
       this.player.push(playerTopCard)
       this.player.push(computerTopCard)
+      this.isDraw = false
       this.roundInfo.innerText = "Player won the round!"
     } else if (winner === "computer") {
-      this.computer.push(playerTopCard)
+      if (this.isDraw) {
+        this.drawCards.forEach(card => {
+          this.computer.push(card)
+        })
+        this.drawCards = []
+      }
       this.computer.push(computerTopCard)
+      this.computer.push(playerTopCard)
+      this.isDraw = false
       this.roundInfo.innerText = "Computer won the round!"
     } else {
-      this.player.push(playerTopCard)
-      this.computer.push(computerTopCard)
+      this.isDraw = true
+      this.drawCards.push(playerTopCard)
+      this.drawCards.push(computerTopCard)
       this.roundInfo.innerText = "Round was a draw!"
     }
+
+    console.log(this.drawCards)
   }
 
   winner(pValue, cValue) {
